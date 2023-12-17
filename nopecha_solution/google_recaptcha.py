@@ -6,13 +6,13 @@ from common_components import constants
 import logging
 
 
-class GoogleReCaptcha(BasePage):
+class nopechaGoogleReCaptcha(BasePage):
     def __init__(self, driver: WebDriver) -> None:
         super().__init__(driver)
         self.captcha = True
         
     
-    def solve_captcha(self):
+    def recaptcha_solution(self):
         self.click_captcha_checkbox()
         while self.captcha:
             instructions_text, images_link, grid = self.get_recaptcha_params()

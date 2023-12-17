@@ -7,4 +7,4 @@ driver.get("https://www.google.com/recaptcha/api2/demo")
 
 captch = GoogleReCaptcha(driver)
 
-captch.check_captcha()
+captch.solve_captcha()

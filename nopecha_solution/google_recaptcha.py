@@ -1,21 +1,37 @@
+import time
+import logging
 import nopecha
+
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webdriver import WebDriver
+
 from base_page import BasePage
 from captcha_locators.google_recaptcha_locator import GoogleReCaptchaLocator
 from common_components import constants
-import logging
-import time
 
 
 class nopechaGoogleReCaptcha(BasePage):
+    
     def __init__(self, driver: WebDriver, key: str) -> None:
+        """
+        Initializes the nopechaGoogleReCaptcha class.
+
+        Args:
+            driver (WebDriver): The WebDriver object for interacting with the web browser.
+            key (str): The key for accessing the nopecha API.
+        """
         super().__init__(driver)
         self.captcha = True
         self.nopecha_key = key
-        
     
     def recaptcha_solution(self):
+        
+        """
+            This function solves the reCAPTCHA challenge by clicking the checkbox, completing the captcha, and returning the result.
+
+            Returns:
+                bool: True if the reCAPTCHA challenge is successfully solved, False otherwise.
+        """
         self.click_captcha_checkbox()
         tries_count = 0
         while self.captcha:
@@ -24,12 +40,20 @@ class nopechaGoogleReCaptcha(BasePage):
             iframe_popup = self.wait_for_element(GoogleReCaptchaLocator.iframe_popup_recaptcha)
             self.switch_to_iframe(iframe_popup)
             self.complete_captcha()
+            self.switch_to_default_content()
+
+            iframe_popup = self.wait_for_element(GoogleReCaptchaLocator.iframe_popup_recaptcha, constants.WAIT_TIMEOUT, silent=True)
+            if not iframe_popup:
+                self.captcha = False
             
         return self.captcha
-        
+    
         
     def click_captcha_checkbox(self):
         
+        """
+            Clicks the reCAPTCHA checkbox to verify the user's action.
+        """        
         iframe_recaptcha_checkbox_locator = self.wait_for_element(GoogleReCaptchaLocator.iframe_checkbox_recaptcha)        
         self.switch_to_iframe(iframe_recaptcha_checkbox_locator)
         
@@ -41,6 +65,10 @@ class nopechaGoogleReCaptcha(BasePage):
         
     def get_recaptcha_text_instructions(self):
         
+        """
+            Returns:
+                str: The text instructions for completing the reCAPTCHA.
+        """        
         time.sleep(2)
         instructions_text_locator = None
         try:
@@ -55,11 +83,18 @@ class nopechaGoogleReCaptcha(BasePage):
             
          
     def complete_captcha(self, counter=1, image_link=None, all_imgs_list=[]):
+        
+        """
+            Completes the captcha challenge using the provided parameters.
 
+            Args:
+                counter (int, optional): The number of the captcha challenge. Defaults to 1.
+                image_link (str, optional): The URL of the captcha image. Defaults to None.
+                all_imgs_list (list, optional): List of all captcha image URLs. Defaults to [].
+        """
         text = self.get_recaptcha_text_instructions()
-        table_iframe = self.wait_for_element(GoogleReCaptchaLocator.table_iframe)
-        total_rows = len(table_iframe.find_elements(By.TAG_NAME,'tr'))
-        all_imgs = table_iframe.find_elements(By.TAG_NAME,'img')
+        total_rows = len(self.wait_for_elements(GoogleReCaptchaLocator.recaptcha_images_rows))
+        all_imgs = self.wait_for_elements(GoogleReCaptchaLocator.recaptcha_images)
         unique_image_links = []
         positions = []
         
@@ -78,40 +113,7 @@ class nopechaGoogleReCaptcha(BasePage):
 
         for each in unique_image_links:
             all_imgs_list.append(each)
-
-        grid_click_array,bool_array = self.nopecha_captcha(text, unique_image_links, total_rows, counter)
-
-        if counter > 1 and total_rows != 4:
-            grid_click_array = [pos for pos, is_true in zip(positions, bool_array) if is_true]
-        
-
-        self.click_captcha_image(grid_click_array)
-
-        if grid_click_array == [] or total_rows == 4:
-            submit_button = self.wait_for_element(GoogleReCaptchaLocator.submit_button)
-            text_submit_button = submit_button.text
-            text_submit_button = text_submit_button.lower().strip()
-            # self.click(submit_button, x_iframe, y_iframe, top_height)
-            submit_button.click()
-            if "next" in text_submit_button or "skip" in text_submit_button:
-                self.complete_captcha(counter+1, image_link, all_imgs_list)
-
-        elif "Click verify once there are none left" in text:
-            self.complete_captcha(counter+1, image_link, all_imgs_list)
-        else:
-            submit_button = self.wait_for_element(GoogleReCaptchaLocator.submit_button)
-            text_submit_button = submit_button.text
-            text_submit_button = text_submit_button.lower().strip()
-            submit_button.click()
-            if "next" in text_submit_button or "skip" in text_submit_button:
-                self.complete_captcha(counter+1, image_link, all_imgs_list)
-
-
-
-    def nopecha_captcha(self, text, unique_image_links, total_rows, counter):
-        
-        nopecha.api_key = self.nopecha_key
-        
+                            
         if total_rows == 3:
             grid = '3x3'
         else:
@@ -123,12 +125,36 @@ class nopechaGoogleReCaptcha(BasePage):
             if int(counter) > 1:
                 grid = '1x1'
 
+        grid_click_array, bool_array = self.nopecha_captcha(text, unique_image_links, grid)
+
+        if counter > 1 and total_rows != 4:
+            grid_click_array = [pos for pos, is_true in zip(positions, bool_array) if is_true]
+        
+
+        self.click_captcha_image(grid_click_array, counter, image_link, all_imgs_list, text)
+
+
+    def nopecha_captcha(self, text, unique_image_links, grid):
+                
+        """
+            This function uses the nopecha API to solve the captcha challenge.
+
+            Args:
+                text (str): The captcha challenge text.
+                unique_image_links (List[str]): List of unique image URLs.
+                grid (str): The grid size of the captcha challenge.
+
+            Returns:
+                List[int]: List of grid indices to click on.
+                List[bool]: List of boolean values indicating whether to click on each grid index.
+        """        
+        nopecha.api_key = self.nopecha_key
 
         try:
             clicks = nopecha.Recognition.solve(
                 type='recaptcha',
                 task=text,
-                image_urls = unique_image_links,
+                image_urls=unique_image_links,
                 grid=grid
             )
             
@@ -145,15 +171,14 @@ class nopechaGoogleReCaptcha(BasePage):
         return grid_click_array, clicks
     
 
-    def click_captcha_image(self, grid_click_array):
+    def click_captcha_image(self, grid_click_array, counter, image_link, all_imgs_list, text):
         
         """
             This function will click on the captcha images by finding its xpath and element through grid_click_array.
 
             Args:
-                grid_click_array (List of integers): List of numbers which are returned from the nopecha key.
-        """
-        
+                grid_click_array (List[int]): List of numbers which are returned from the nopecha key.
+        """        
         total_rows = len(self.wait_for_elements(GoogleReCaptchaLocator.recaptcha_images_rows))
         
         for number in grid_click_array:
@@ -161,3 +186,17 @@ class nopechaGoogleReCaptcha(BasePage):
             cell = self.wait_for_element(cell_xpath)
             
             cell.click()
+        
+        submit_button = self.wait_for_element(GoogleReCaptchaLocator.submit_button)
+        text_submit_button = submit_button.text
+        text_submit_button = text_submit_button.lower().strip()
+            
+        if grid_click_array == []:
+            submit_button.click()
+                        
+        elif "Click verify once there are none left" in text:
+            self.complete_captcha(counter+1, image_link, all_imgs_list)
+        else:
+            if "skip" in text_submit_button:
+                self.complete_captcha(counter+1, image_link, all_imgs_list)
+            submit_button.click()

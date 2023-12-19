@@ -24,8 +24,8 @@ class Main:
         
         captcha_class, captcha_method = captcha_map[self.captcha_type]
         capthca_instance = captcha_class(self.driver, constants.NOPECHA_API_KEY)
-        captcha = getattr(capthca_instance, captcha_method)()
-        return captcha
+        captcha, tries_count = getattr(capthca_instance, captcha_method)()
+        return captcha, tries_count
     
 
 main = Main('nopecha', 'recaptcha', driver)

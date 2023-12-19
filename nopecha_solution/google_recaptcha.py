@@ -13,24 +13,26 @@ from common_components import constants
 class nopechaGoogleReCaptcha(BasePage):
     
     def __init__(self, driver: WebDriver, key: str) -> None:
+        
         """
-        Initializes the nopechaGoogleReCaptcha class.
+            Initializes the nopechaGoogleReCaptcha class.
 
-        Args:
-            driver (WebDriver): The WebDriver object for interacting with the web browser.
-            key (str): The key for accessing the nopecha API.
+            Args:
+                driver (WebDriver): The WebDriver object for interacting with the web browser.
+                key (str): The key for accessing the nopecha API.
         """
         super().__init__(driver)
         self.captcha = True
         self.nopecha_key = key
     
-    def recaptcha_solution(self):
-        
+    
+    def recaptcha_solution(self): 
+               
         """
             This function solves the reCAPTCHA challenge by clicking the checkbox, completing the captcha, and returning the result.
 
             Returns:
-                bool: True if the reCAPTCHA challenge is successfully solved, False otherwise.
+                bool: False if the reCAPTCHA challenge is successfully solved, True otherwise otherwise.
         """
         self.click_captcha_checkbox()
         tries_count = 0
@@ -46,7 +48,7 @@ class nopechaGoogleReCaptcha(BasePage):
             if not iframe_popup:
                 self.captcha = False
             
-        return self.captcha
+        return self.captcha, tries_count
     
         
     def click_captcha_checkbox(self):
@@ -183,8 +185,7 @@ class nopechaGoogleReCaptcha(BasePage):
         
         for number in grid_click_array:
             cell_xpath = GoogleReCaptchaLocator.get_matched_image_path(number, total_rows)
-            cell = self.wait_for_element(cell_xpath)
-            
+            cell = self.wait_for_element(cell_xpath)            
             cell.click()
         
         submit_button = self.wait_for_element(GoogleReCaptchaLocator.submit_button)
@@ -193,7 +194,6 @@ class nopechaGoogleReCaptcha(BasePage):
             
         if grid_click_array == []:
             submit_button.click()
-                        
         elif "Click verify once there are none left" in text:
             self.complete_captcha(counter+1, image_link, all_imgs_list)
         else:

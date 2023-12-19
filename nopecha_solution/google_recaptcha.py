@@ -148,7 +148,7 @@ class nopechaGoogleReCaptcha(BasePage):
     def click_captcha_image(self, grid_click_array):
         
         """
-            This function will xlickon the captcha images by finding its xpath and element through grid_click_array.
+            This function will click on the captcha images by finding its xpath and element through grid_click_array.
 
             Args:
                 grid_click_array (List of integers): List of numbers which are returned from the nopecha key.

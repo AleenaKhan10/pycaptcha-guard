@@ -56,3 +56,28 @@ class BasePage:
             if not silent:
                 logging.exception(f"Elements with locator {locator} on url {self.driver.current_url} not found within {timeout} seconds")
         return None
+    
+    
+    def enter_text(self, by_locator: Tuple[str, str], text: str) -> None:
+        """ Performs text entry of the passed in text, in a web element whose locator is passed to it"""
+        
+        self.driver.execute_script("window.onfocus")
+        element = self.wait_for_element(by_locator)
+
+        if element:
+            for one in text:
+                element.send_keys(one)
+
+            self.press_enter_on_element(by_locator)
+        time.sleep(2) 
+        
+        
+    def press_enter_on_element(self, locator: Tuple[str, str]):
+        try:
+            element = self.wait_for_element(locator, constants.WAIT_TIMEOUT, silent=True)
+            if element:
+                element.send_keys(Keys.ENTER)
+            else:
+                ActionChains(self.driver).send_keys(Keys.ENTER).perform()
+        except (NoSuchElementException, ElementNotVisibleException, ElementNotSelectableException):
+            logging.exception(f"Element with locator {locator} not found or not editable")

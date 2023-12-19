@@ -3,9 +3,11 @@ from selenium.webdriver.common.by import By
 class GoogleReCaptchaLocator:
     
     @staticmethod
-    def get_matched_image_path(number):
+    def get_matched_image_path(number, total_cols):
         if number:
-            return (By.XPATH, f'//table//td[@tabindex="{number+3}"]')
+            row = (number - 1) // total_cols
+            col = (number - 1) % total_cols
+            return (By.XPATH, f'//table//tr[{row+1}]/td[{col+1}]')
         return None
     
     
@@ -19,5 +21,6 @@ class GoogleReCaptchaLocator:
     recaptcha_images = (By.XPATH, "//table//img")
     submit_button = (By.ID,'recaptcha-verify-button')
     try_again_error = (By.CLASS_NAME, "rc-imageselect-incorrect-response")
-    selecl_more_error = (By.CLASS_NAME, "rc-imageselect-error-select-more")
+    select_more_error = (By.CLASS_NAME, "rc-imageselect-error-select-more")
     select_new_error = (By.CLASS_NAME, "rc-imageselect-error-select-something")
+    image_link = (By.TAG_NAME, "img")

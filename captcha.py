@@ -5,7 +5,7 @@ from common_components import constants
 
 driver = webdriver.Chrome()
 
-class Main:
+class SolveCaptcha:
     def __init__(self, key, captcha_type, driver) -> None:
         self.key_file = key
         self.captcha_type = captcha_type
@@ -28,7 +28,7 @@ class Main:
         return captcha, tries_count
     
 
-main = Main('nopecha', 'recaptcha', driver)
+main = SolveCaptcha('nopecha', 'recaptcha', driver)
 main.solve_captcha()
     
     

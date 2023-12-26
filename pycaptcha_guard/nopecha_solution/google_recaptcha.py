@@ -5,9 +5,9 @@ import nopecha
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webdriver import WebDriver
 
-from base_page import BasePage
-from captcha_locators.google_recaptcha_locator import GoogleReCaptchaLocator
-from common_components import constants
+from pycaptcha_guard.base_page import BasePage
+from pycaptcha_guard.captcha_locators.google_recaptcha_locator import GoogleReCaptchaLocator
+from pycaptcha_guard.common_components import constants
 
 
 class nopechaGoogleReCaptcha(BasePage):

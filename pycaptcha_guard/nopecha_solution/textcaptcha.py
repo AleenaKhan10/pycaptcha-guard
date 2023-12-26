@@ -1,6 +1,6 @@
 from selenium.webdriver.remote.webdriver import WebDriver
-from base_page import BasePage
-from captcha_locators.textcaptcha_locator import TextCaptchaLocators
+from pycaptcha_guard.base_page import BasePage
+from pycaptcha_guard.captcha_locators.textcaptcha_locator import TextCaptchaLocators
 import nopecha
 
 

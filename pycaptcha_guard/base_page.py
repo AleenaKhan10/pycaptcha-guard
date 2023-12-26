@@ -19,7 +19,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import TimeoutException, NoSuchElementException, ElementNotVisibleException, ElementNotSelectableException, ElementNotInteractableException, StaleElementReferenceException, JavascriptException
 
 # # Local application imports
-from common_components import constants
+from pycaptcha_guard.common_components import constants
 # from common_components.context import ParamContext
 # from locators.locator_base_page import BasePageLocators
 # from mixins import AllMixin

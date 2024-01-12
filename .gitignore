@@ -2,3 +2,4 @@ venv
 poetry.lock
 dist
 pycaptcha_guard.egg-info
+__pycache__

@@ -1,4 +1,3 @@
-from selenium import webdriver
 from pycaptcha_guard.nopecha_solution.google_recaptcha import nopechaGoogleReCaptcha
 from pycaptcha_guard.nopecha_solution.textcaptcha import nopechaTextCaptcha
 from pycaptcha_guard.common_components import constants

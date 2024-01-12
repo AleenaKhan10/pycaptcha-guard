@@ -193,11 +193,11 @@ class nopechaGoogleReCaptcha(BasePage):
         text_submit_button = text_submit_button.lower().strip()
             
         if grid_click_array == []:
-            self.click(submit_button)
+            self.click_captcha(submit_button)
         elif "Click verify once there are none left" in text:
             self.complete_captcha(counter+1, image_link, all_imgs_list)
         else:
             if "skip" in text_submit_button:
                 self.complete_captcha(counter+1, image_link, all_imgs_list)
-            self.click(submit_button)
+            self.click_captcha(submit_button)
 

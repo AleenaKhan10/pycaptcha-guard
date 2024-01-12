@@ -1,15 +1,10 @@
 # Standard library imports
-import os
-import datetime
 import logging
 import random
 import time
-from pathlib import Path
-from typing import List, Tuple, Optional, Union
-
-# Third party imports
-from PIL import Image
 import pyautogui
+from typing import List, Tuple, Optional
+
 from selenium.webdriver import ActionChains
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.remote.webdriver import WebDriver
@@ -18,11 +13,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import TimeoutException, NoSuchElementException, ElementNotVisibleException, ElementNotSelectableException, ElementNotInteractableException, StaleElementReferenceException, JavascriptException
 
-# # Local application imports
 from pycaptcha_guard.common_components import constants
-# from common_components.context import ParamContext
-# from locators.locator_base_page import BasePageLocators
-# from mixins import AllMixin
 
 class BasePage:
     """Base class to initialize the base page that will be called from all pages"""

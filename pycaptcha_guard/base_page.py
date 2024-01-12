@@ -44,6 +44,7 @@ class BasePage:
         
     def switch_to_iframe(self, locator: Tuple[str, str], timeout: int = constants.WAIT_TIMEOUT) -> None:
         WebDriverWait(self.driver, timeout).until(EC.frame_to_be_available_and_switch_to_it(locator))
+        
                 
     def switch_to_default_content(self) -> None:
         self.driver.switch_to.default_content()
@@ -81,3 +82,79 @@ class BasePage:
                 ActionChains(self.driver).send_keys(Keys.ENTER).perform()
         except (NoSuchElementException, ElementNotVisibleException, ElementNotSelectableException):
             logging.exception(f"Element with locator {locator} not found or not editable")
+            
+            
+    def click_captcha(self, element: WebElement ) -> None:
+        """ 
+            Performs click on captcha web element whose locator is passed to it
+        """
+        
+        try: 
+            self.move_mouse_to_captcha_element(element)
+        except:
+            pass
+        try:
+            element.click()
+        except:
+            try:
+                self.driver.execute_script("arguments[0].scrollIntoView();", element)
+                element.click()
+            except:
+                try:
+                    self.driver.execute_script("arguments[0].scrollIntoView();", element)
+                    self.driver.execute_script("arguments[0].click();", element)
+                except:
+                    pass
+                
+                
+    def move_mouse_to_captcha_element(self, element):
+        """
+        Move the mouse to a random location within a WebElement.
+
+        Parameters:
+        - `element`: a Selenium WebElement
+        """
+        
+        x_iframe, y_iframe, top_height = self.get_frame_axis(element)
+        
+        try:
+            # Get the size and location of the element
+            loc = element.location
+            size = element.size
+
+            # Obtain the window position
+            window_position = self.driver.get_window_position()
+
+            # Adjust the location of the WebElement by the position of the WebDriver's browser window
+            loc['x'] += window_position['x'] + x_iframe
+            loc['y'] += window_position['y'] + top_height + y_iframe
+
+            # Get the position of each side of the element
+            top, bottom = loc['y'], loc['y'] + size['height']
+            left, right = loc['x'], loc['x'] + size['width']
+
+            # Generate a random location within these bounds
+            end_x = int(random.uniform(left, right))
+            end_y = int(random.uniform(top, bottom))
+
+            pyautogui.moveTo(end_x, end_y, duration=0.5)
+        except:
+            pass
+        try:
+            actions = ActionChains(self.driver)
+            actions.move_to_element(element)
+            actions.perform()
+        except:
+            pass
+        
+                
+    def get_frame_axis(self, element):
+        """
+            Get the axis of the iframe
+        """
+        
+        x_iframe = element.location['x']
+        y_iframe = element.location['y']
+        top_height = self.driver.execute_script("return window.outerHeight - window.innerHeight;")
+        
+        return x_iframe, y_iframe, top_height

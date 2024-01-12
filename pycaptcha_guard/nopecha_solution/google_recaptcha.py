@@ -60,7 +60,7 @@ class nopechaGoogleReCaptcha(BasePage):
         self.switch_to_iframe(iframe_recaptcha_checkbox_locator)
         
         recaptcha_checkbox_locator = self.wait_for_element(GoogleReCaptchaLocator.recaptcha_checkbox)
-        recaptcha_checkbox_locator.click()
+        self.click_captcha(recaptcha_checkbox_locator)
         
         self.switch_to_default_content()
         
@@ -186,17 +186,18 @@ class nopechaGoogleReCaptcha(BasePage):
         for number in grid_click_array:
             cell_xpath = GoogleReCaptchaLocator.get_matched_image_path(number, total_rows)
             cell = self.wait_for_element(cell_xpath)            
-            cell.click()
+            self.click_captcha(cell)
         
         submit_button = self.wait_for_element(GoogleReCaptchaLocator.submit_button)
         text_submit_button = submit_button.text
         text_submit_button = text_submit_button.lower().strip()
             
         if grid_click_array == []:
-            submit_button.click()
+            self.click(submit_button)
         elif "Click verify once there are none left" in text:
             self.complete_captcha(counter+1, image_link, all_imgs_list)
         else:
             if "skip" in text_submit_button:
                 self.complete_captcha(counter+1, image_link, all_imgs_list)
-            submit_button.click()
+            self.click(submit_button)
+

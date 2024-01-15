@@ -104,6 +104,7 @@ class BasePage:
 
         Parameters:
         - `element`: a Selenium WebElement
+        - `iframe measure`: iframe axis location for exact mouse movement
         """
         x_iframe, y_iframe, top_height = iframe_measures
                 

@@ -140,7 +140,7 @@ class BasePage:
                 
     def get_frame_axis(self, element):
         """
-            Get the axis of the iframe
+            Get the locations of axis of the iframe and windows top bar height
         """
         
         x_iframe = element.location['x']

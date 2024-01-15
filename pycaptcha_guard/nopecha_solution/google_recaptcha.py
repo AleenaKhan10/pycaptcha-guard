@@ -40,6 +40,7 @@ class nopechaGoogleReCaptcha(BasePage):
             tries_count += 1
             
             iframe_popup = self.wait_for_element(GoogleReCaptchaLocator.iframe_popup_recaptcha)
+            time.sleep(2)
             iframe_popup_measures = self.get_frame_axis(iframe_popup)
             self.switch_to_iframe(iframe_popup)
             self.complete_captcha(iframe_popup_measures)

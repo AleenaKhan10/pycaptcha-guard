@@ -93,6 +93,7 @@ class nopechaGoogleReCaptcha(BasePage):
             Completes the captcha challenge using the provided parameters.
 
             Args:
+                iframe measures (list, required): List of measures of iframe's x-axis and y-axis and top height of browser. 
                 counter (int, optional): The number of the captcha challenge. Defaults to 1.
                 image_link (str, optional): The URL of the captcha image. Defaults to None.
                 all_imgs_list (list, optional): List of all captcha image URLs. Defaults to [].

@@ -75,13 +75,13 @@ class BasePage:
             logging.exception(f"Element with locator {locator} not found or not editable")
             
             
-    def click_captcha(self, element: WebElement ) -> None:
+    def click_captcha(self, element: WebElement, iframe_measures ) -> None:
         """ 
             Performs click on captcha web element whose locator is passed to it
         """
         
         try: 
-            self.move_mouse_to_captcha_element(element)
+            self.move_mouse_to_captcha_element(element, iframe_measures)
         except:
             pass
         try:
@@ -98,16 +98,15 @@ class BasePage:
                     pass
                 
                 
-    def move_mouse_to_captcha_element(self, element):
+    def move_mouse_to_captcha_element(self, element, iframe_measures):
         """
         Move the mouse to a random location within a WebElement.
 
         Parameters:
         - `element`: a Selenium WebElement
         """
-        
-        x_iframe, y_iframe, top_height = self.get_frame_axis(element)
-        
+        x_iframe, y_iframe, top_height = iframe_measures
+                
         try:
             # Get the size and location of the element
             loc = element.location

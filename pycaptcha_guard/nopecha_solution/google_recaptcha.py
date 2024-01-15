@@ -40,8 +40,9 @@ class nopechaGoogleReCaptcha(BasePage):
             tries_count += 1
             
             iframe_popup = self.wait_for_element(GoogleReCaptchaLocator.iframe_popup_recaptcha)
+            iframe_popup_measures = self.get_frame_axis()
             self.switch_to_iframe(iframe_popup)
-            self.complete_captcha()
+            self.complete_captcha(iframe_popup_measures)
             self.switch_to_default_content()
 
             iframe_popup = self.wait_for_element(GoogleReCaptchaLocator.iframe_popup_recaptcha, constants.WAIT_TIMEOUT, silent=True)
@@ -56,11 +57,12 @@ class nopechaGoogleReCaptcha(BasePage):
         """
             Clicks the reCAPTCHA checkbox to verify the user's action.
         """        
-        iframe_recaptcha_checkbox_locator = self.wait_for_element(GoogleReCaptchaLocator.iframe_checkbox_recaptcha)        
+        iframe_recaptcha_checkbox_locator = self.wait_for_element(GoogleReCaptchaLocator.iframe_checkbox_recaptcha)  
+        iframe_recaptcha_checkbox_locator_measures = self.get_frame_axis(iframe_recaptcha_checkbox_locator)       
         self.switch_to_iframe(iframe_recaptcha_checkbox_locator)
         
         recaptcha_checkbox_locator = self.wait_for_element(GoogleReCaptchaLocator.recaptcha_checkbox)
-        self.click_captcha(recaptcha_checkbox_locator)
+        self.click_captcha(recaptcha_checkbox_locator, iframe_recaptcha_checkbox_locator_measures)
         
         self.switch_to_default_content()
         
@@ -84,7 +86,7 @@ class nopechaGoogleReCaptcha(BasePage):
         return instructions_text_locator
             
          
-    def complete_captcha(self, counter=1, image_link=None, all_imgs_list=[]):
+    def complete_captcha(self, iframe_popup_measures, counter=1, image_link=None, all_imgs_list=[]):
         
         """
             Completes the captcha challenge using the provided parameters.
@@ -133,7 +135,7 @@ class nopechaGoogleReCaptcha(BasePage):
             grid_click_array = [pos for pos, is_true in zip(positions, bool_array) if is_true]
         
 
-        self.click_captcha_image(grid_click_array, counter, image_link, all_imgs_list, text)
+        self.click_captcha_image(iframe_popup_measures, grid_click_array, counter, image_link, all_imgs_list, text)
 
 
     def nopecha_captcha(self, text, unique_image_links, grid):
@@ -173,7 +175,7 @@ class nopechaGoogleReCaptcha(BasePage):
         return grid_click_array, clicks
     
 
-    def click_captcha_image(self, grid_click_array, counter, image_link, all_imgs_list, text):
+    def click_captcha_image(self, iframe_popup_measures, grid_click_array, counter, image_link, all_imgs_list, text):
         
         """
             This function will click on the captcha images by finding its xpath and element through grid_click_array.
@@ -186,18 +188,18 @@ class nopechaGoogleReCaptcha(BasePage):
         for number in grid_click_array:
             cell_xpath = GoogleReCaptchaLocator.get_matched_image_path(number, total_rows)
             cell = self.wait_for_element(cell_xpath)            
-            self.click_captcha(cell)
+            self.click_captcha(cell, iframe_popup_measures)
         
         submit_button = self.wait_for_element(GoogleReCaptchaLocator.submit_button)
         text_submit_button = submit_button.text
         text_submit_button = text_submit_button.lower().strip()
             
         if grid_click_array == []:
-            self.click_captcha(submit_button)
+            self.click_captcha(submit_button, iframe_popup_measures)
         elif "Click verify once there are none left" in text:
-            self.complete_captcha(counter+1, image_link, all_imgs_list)
+            self.complete_captcha(iframe_popup_measures, counter+1, image_link, all_imgs_list)
         else:
             if "skip" in text_submit_button:
-                self.complete_captcha(counter+1, image_link, all_imgs_list)
-            self.click_captcha(submit_button)
+                self.complete_captcha(iframe_popup_measures, counter+1, image_link, all_imgs_list)
+            self.click_captcha(submit_button, iframe_popup_measures)
 

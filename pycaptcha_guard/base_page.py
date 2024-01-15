@@ -65,6 +65,12 @@ class BasePage:
         
         
     def press_enter_on_element(self, locator: Tuple[str, str]):
+        """
+            Take the element and press enter in that element
+
+        Args:
+            locator (Tuple[str, str]): Element locator to perform actions
+        """
         try:
             element = self.wait_for_element(locator, constants.WAIT_TIMEOUT, silent=True)
             if element:

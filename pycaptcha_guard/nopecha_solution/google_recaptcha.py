@@ -43,7 +43,11 @@ class nopechaGoogleReCaptcha(BasePage):
             time.sleep(2)
             iframe_popup_measures = self.get_frame_axis(iframe_popup)
             self.switch_to_iframe(iframe_popup)
-            self.complete_captcha(iframe_popup_measures)
+            try:
+                self.complete_captcha(iframe_popup_measures)
+            except Exception as e:
+                logging.exception(f"Error while solving captcha {e}")
+                
             self.switch_to_default_content()
 
             iframe_popup = self.wait_for_element(GoogleReCaptchaLocator.iframe_popup_recaptcha, constants.WAIT_TIMEOUT, silent=True)
@@ -131,7 +135,14 @@ class nopechaGoogleReCaptcha(BasePage):
             if int(counter) > 1:
                 grid = '1x1'
 
-        grid_click_array, bool_array = self.nopecha_captcha(text, unique_image_links, grid)
+        for _ in range(constants.MAX_RECURSION_COUNT):
+            try:
+                grid_click_array, bool_array = self.nopecha_captcha(text, unique_image_links, grid)
+                break
+            except Exception as e:
+                logging.exception(f"Unable to get the API response : {e}") 
+                time.sleep(4)
+                       
 
         if counter > 1 and total_rows != 4:
             grid_click_array = [pos for pos, is_true in zip(positions, bool_array) if is_true]
@@ -195,6 +206,7 @@ class nopechaGoogleReCaptcha(BasePage):
         submit_button = self.wait_for_element(GoogleReCaptchaLocator.submit_button)
         text_submit_button = submit_button.text
         text_submit_button = text_submit_button.lower().strip()
+        time.sleep(4)
             
         if grid_click_array == []:
             self.click_captcha(submit_button, iframe_popup_measures)

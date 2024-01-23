@@ -1,9 +1,12 @@
 import nopecha
+import logging
+import time
 
 from selenium.webdriver.remote.webdriver import WebDriver
 
 from pycaptcha_guard.base_page import BasePage
 from pycaptcha_guard.captcha_locators.textcaptcha_locator import TextCaptchaLocators
+from pycaptcha_guard.common_components import constants
 
 
 
@@ -36,7 +39,14 @@ class nopechaTextCaptcha(BasePage):
             tries_count += 1
             
             captcha_image_src = self.get_textcaptcha_params()
-            solution = self.get_captcha_solution(captcha_image_src)
+            for _ in range(constants.MAX_RECURSION_COUNT):
+                try:
+                    solution = self.get_captcha_solution(captcha_image_src)
+                    break
+                except Exception as e:
+                    logging.exception(f"Unable to get API response {e}")
+                    time.sleep(4)
+                    
             self.captcha = self.fill_input_field(solution)
         return self.captcha, tries_count
         

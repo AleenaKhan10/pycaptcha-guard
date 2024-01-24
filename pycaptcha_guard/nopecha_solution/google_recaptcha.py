@@ -40,8 +40,7 @@ class nopechaGoogleReCaptcha(BasePage):
             tries_count += 1
             
             iframe_popup = self.wait_for_element(GoogleReCaptchaLocator.iframe_popup_recaptcha)
-            time.sleep(2)
-            iframe_popup_measures = self.get_frame_axis(iframe_popup)
+            iframe_popup_measures = self.get_frame_axis(iframe_popup, GoogleReCaptchaLocator.iframe_popup_recaptcha)
             self.switch_to_iframe(iframe_popup)
             try:
                 self.complete_captcha(iframe_popup_measures)
@@ -63,7 +62,7 @@ class nopechaGoogleReCaptcha(BasePage):
             Clicks the reCAPTCHA checkbox to verify the user's action.
         """        
         iframe_recaptcha_checkbox_locator = self.wait_for_element(GoogleReCaptchaLocator.iframe_checkbox_recaptcha)  
-        iframe_recaptcha_checkbox_locator_measures = self.get_frame_axis(iframe_recaptcha_checkbox_locator)       
+        iframe_recaptcha_checkbox_locator_measures = self.get_frame_axis(iframe_recaptcha_checkbox_locator, GoogleReCaptchaLocator.iframe_checkbox_recaptcha)       
         self.switch_to_iframe(iframe_recaptcha_checkbox_locator)
         
         recaptcha_checkbox_locator = self.wait_for_element(GoogleReCaptchaLocator.recaptcha_checkbox)

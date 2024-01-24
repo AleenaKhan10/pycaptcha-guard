@@ -145,13 +145,27 @@ class BasePage:
             pass
         
                 
-    def get_frame_axis(self, element):
+    def get_frame_axis(self, element, locator):
         """
             Get the locations of axis of the iframe and windows top bar height
         """
-        
-        x_iframe = element.location['x']
-        y_iframe = element.location['y']
-        top_height = self.driver.execute_script("return window.outerHeight - window.innerHeight;")
+        try:
+            x_iframe = element.location['x']
+            y_iframe = element.location['y']
+            top_height = self.driver.execute_script("return window.outerHeight - window.innerHeight;")
+        except StaleElementReferenceException:
+            element = self.wait_for_element(locator, constants.WAIT_TIMEOUT, silent=True)
+            if element:
+                x_iframe = element.location['x']
+                y_iframe = element.location['y']
+                top_height = self.driver.execute_script("return window.outerHeight - window.innerHeight;")
+        except Exception as e:
+            logging.exception(f'error while getting iframe axis : {e}')
+            element = self.wait_for_element(locator, constants.WAIT_TIMEOUT, silent=True)
+            if element:
+                x_iframe = element.location['x']
+                y_iframe = element.location['y']
+                top_height = self.driver.execute_script("return window.outerHeight - window.innerHeight;")
+            
         
         return x_iframe, y_iframe, top_height

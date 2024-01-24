@@ -37,27 +37,36 @@ class nopechaGoogleReCaptcha(BasePage):
         """
         self.click_captcha_checkbox()
         tries_count = 0
+        start_time = time.time()
+        
         while self.captcha:
+            if round(time.time() - start_time) < 120:
+                logging.info('Going to click to checkbox again')
+                start_time = time.time()
+                self.click_captcha_checkbox()
+            
             tries_count += 1
             
             iframe_popup = self.wait_for_element(GoogleReCaptchaLocator.iframe_popup_recaptcha)
+            time.sleep(2)
             iframe_popup_measures = self.get_frame_axis(iframe_popup, GoogleReCaptchaLocator.iframe_popup_recaptcha)
             self.switch_to_iframe(iframe_popup)
             try:
                 logging.info("Solving captcha")
-                self.complete_captcha(iframe_popup_measures)
-            except TimeoutException:
-                try:
-                    logging.info('going to click to the checkbox again')
-                    self.click_captcha_checkbox()
-                except:
-                    pass                
+                self.complete_captcha(iframe_popup_measures)                
+              
             except Exception as e:
                 logging.exception(f"Error while solving captcha {e}")
+                retry = True
 
                 
             logging.info('Going to switch to the default content')
             self.switch_to_default_content()
+            
+            if retry:
+                logging.info('Going to click to checkbox again')
+                self.click_captcha_checkbox()
+                retry = False
 
             iframe_popup = self.wait_for_element(GoogleReCaptchaLocator.iframe_popup_recaptcha, constants.WAIT_TIMEOUT, silent=True)
             logging.info('Iframe found Trying again')

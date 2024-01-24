@@ -155,6 +155,7 @@ class BasePage:
             top_height = self.driver.execute_script("return window.outerHeight - window.innerHeight;")
         except StaleElementReferenceException:
             element = self.wait_for_element(locator, constants.WAIT_TIMEOUT, silent=True)
+            time.sleep(2)
             if element:
                 x_iframe = element.location['x']
                 y_iframe = element.location['y']
@@ -162,6 +163,7 @@ class BasePage:
         except Exception as e:
             logging.exception(f'error while getting iframe axis : {e}')
             element = self.wait_for_element(locator, constants.WAIT_TIMEOUT, silent=True)
+            time.sleep(2)
             if element:
                 x_iframe = element.location['x']
                 y_iframe = element.location['y']

@@ -39,8 +39,8 @@ class nopechaGoogleReCaptcha(BasePage):
         tries_count = 0
         start_time = time.time()
         
-        while self.captcha:
-            if round(time.time() - start_time) > 120:
+        while self.captcha and tries_count < constants.RECURSION_COUNT_SIX:
+            if round(time.time() - start_time) > constants.CAPTCHA_MAX_TIME:
                 logging.info('Going to click to checkbox again')
                 start_time = time.time()
                 self.click_captcha_checkbox()
@@ -57,7 +57,6 @@ class nopechaGoogleReCaptcha(BasePage):
               
             except Exception as e:
                 logging.exception(f"Error while solving captcha {e}")
-                retry = True
 
                 
             logging.info('Going to switch to the default content')

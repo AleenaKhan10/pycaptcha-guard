@@ -40,7 +40,7 @@ class nopechaGoogleReCaptcha(BasePage):
         start_time = time.time()
         
         while self.captcha:
-            if round(time.time() - start_time) < 120:
+            if round(time.time() - start_time) > 120:
                 logging.info('Going to click to checkbox again')
                 start_time = time.time()
                 self.click_captcha_checkbox()

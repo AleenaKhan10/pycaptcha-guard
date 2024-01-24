@@ -62,6 +62,7 @@ class nopechaGoogleReCaptcha(BasePage):
             logging.info('Going to switch to the default content')
             self.switch_to_default_content()
 
+            time.sleep(3)
             iframe_popup = self.wait_for_element(GoogleReCaptchaLocator.iframe_popup_recaptcha, constants.WAIT_TIMEOUT, silent=True)
             logging.info('Iframe found Trying again')
             if not iframe_popup:

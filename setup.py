@@ -2,7 +2,7 @@ import setuptools
 
 setuptools.setup(
     name="pycaptcha-guard",
-    version="0.1.8",
+    version="0.1.9",
     author="AleenaMuskan",
     author_email="aleenakhanraees40@gmail.com",
     description="Solve any kind of captcha like human",

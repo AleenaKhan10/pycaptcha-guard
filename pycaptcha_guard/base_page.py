@@ -149,6 +149,11 @@ class BasePage:
         """
             Get the locations of axis of the iframe and windows top bar height
         """
+        
+        x_iframe = None
+        y_iframe = None
+        top_height = None
+        
         try:
             x_iframe = element.location['x']
             y_iframe = element.location['y']

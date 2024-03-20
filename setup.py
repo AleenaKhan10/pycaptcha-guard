@@ -14,7 +14,8 @@ setuptools.setup(
         "nopecha==1.0.8",
         "selenium==4.16.0",
         "pillow==10.1.0",
-        "pyautogui==0.9.54"
+        "pyautogui==0.9.54",
+        "capsolver==1.0.7"
     ],
     python_requires=">=3.9",
 )

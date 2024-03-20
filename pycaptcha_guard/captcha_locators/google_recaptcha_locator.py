@@ -19,6 +19,7 @@ class GoogleReCaptchaLocator:
     instruction_text2 = (By.CLASS_NAME, "rc-imageselect-desc")
     recaptcha_images_rows = (By.XPATH, "//table//tr")
     recaptcha_images = (By.XPATH, "//table//img")
+    recaptcha_full_image = (By.XPATH,"//img[contains(@class, 'rc-image-tile')]")
     submit_button = (By.ID,'recaptcha-verify-button')
     try_again_error = (By.CLASS_NAME, "rc-imageselect-incorrect-response")
     select_more_error = (By.CLASS_NAME, "rc-imageselect-error-select-more")

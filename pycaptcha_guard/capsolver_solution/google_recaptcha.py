@@ -104,14 +104,35 @@ class capsolverGoogleReCaptcha(BasePage):
         if full_image_locator:
             img_source = full_image_locator.get_attribute('src')
             logging.info(f"Image source found: {img_source}")
+            
+        all_imgs = self.wait_for_elements(GoogleReCaptchaLocator.recaptcha_images)
+        unique_image_links = []
+        positions = []
+        all_imgs_list=[]
+        
+        image_link =self.wait_for_element(GoogleReCaptchaLocator.image_link).get_attribute("src")
+        unique_image_links.append(image_link)
+
+        for one_img in all_imgs:            
+            img_src = one_img.get_attribute("src")
+            if img_src != image_link:
+                if img_src not in [img[0] for img in unique_image_links]:
+                    if img_src not in all_imgs_list:
+                        td_ancestor = one_img.find_element(By.XPATH,"ancestor::td")
+                        position_index = int(td_ancestor.get_attribute("tabIndex"))-3
+                        positions.append(position_index)
+                        unique_image_links.append((img_src, position_index))
+
+        for each in unique_image_links:
+            all_imgs_list.append(each)
         
         for _ in range(constants.MAX_RECURSION_COUNT):
             try:
-                grid_click_array, bool_array = self.capsolver_captcha(text)
+                grid_click_array = self.capsolver_captcha(text, unique_image_links)
                 break
             except Exception as e:
                 logging.exception(f"Unable to get the API response : {e}") 
-                time.sleep(4)
+                time.sleep(2)
         
 
         self.click_captcha_image(iframe_popup_measures, grid_click_array, text)
@@ -127,17 +148,17 @@ class capsolverGoogleReCaptcha(BasePage):
         """        
         total_rows = len(self.wait_for_elements(GoogleReCaptchaLocator.recaptcha_images_rows))
         
-        for number in grid_click_array:
-            cell_xpath = GoogleReCaptchaLocator.get_matched_image_path(number, total_rows)
+        for number in grid_click_array.get("objects"):
+            cell_xpath = GoogleReCaptchaLocator.get_matched_image_path(number+1, total_rows)
             cell = self.wait_for_element(cell_xpath)            
             self.click_captcha(cell, iframe_popup_measures)
         
         submit_button = self.wait_for_element(GoogleReCaptchaLocator.submit_button)
         text_submit_button = submit_button.text
         text_submit_button = text_submit_button.lower().strip()
-        time.sleep(4)
+        time.sleep(2)
             
-        if grid_click_array == []:
+        if grid_click_array.get("objects") == []:
             self.click_captcha(submit_button, iframe_popup_measures)
         elif "Click verify once there are none left" in text:
             self.complete_captcha(iframe_popup_measures)
@@ -147,7 +168,7 @@ class capsolverGoogleReCaptcha(BasePage):
             self.click_captcha(submit_button, iframe_popup_measures)
             
                     
-    def capsolver_captcha(text, image_url):
+    def capsolver_captcha(self, text, image_url):
         """
         This function sends the captcha image to the capsolver API and returns the solution.
 
@@ -158,30 +179,83 @@ class capsolverGoogleReCaptcha(BasePage):
         Returns:
             solution: The solution returned by the capsolver API.
         """
-        # Optimize the code by checking the response status directly in the if condition
-        if requests.get(image_url).status_code == 200:
-            # Use context manager for file operations for better resource management
-            with requests.get(image_url) as response, open("captcha_image.png", "wb") as f:
-                f.write(response.content)
+        
+        capsolver.api_key = self.capsolver_key
+
+        keyword = text.split('\n')[1]
+        
+        keyword_map = {
+            "/m/0pg52": "taxis",
+            "/m/01bjv": "bus",
+            "/m/02yvhj": "school bus",
+            "/m/04_sv": "motorcycles",
+            "/m/013xlm": "tractors",
+            "/m/01jk_4": "chimneys",
+            "/m/014xcs": "crosswalks",
+            "/m/015qff": "traffic lights",
+            "/m/0199g": "bicycles",
+            "/m/015qbp": "parking meters",
+            "/m/0k4j": "cars",
+            "/m/015kr": "bridges",
+            "/m/019jd": "boats",
+            "/m/0cdl1": "palm trees",
+            "/m/09d_r": "mountains or hills",
+            "/m/01pns0": "fire hydrant",
+            "/m/01lynh": "stairs"
+        }
+        
+        for code, word in keyword_map.items():
+            if word in keyword:
+                question_code = code
+                break
+
+        if len(image_url) == 1:
+            if requests.get(image_url[0]).status_code == 200:
+
+                with requests.get(image_url[0]) as response, open("captcha_image.png", "wb") as f:
+                    f.write(response.content)
+                
+                with open("captcha_image.png", "rb") as image_file:
+                    encoded_string = base64.b64encode(image_file.read()).decode('utf-8')
             
-            # Convert the image to a base64 encoded string
-            with open("captcha_image.png", "rb") as image_file:
-                encoded_string = base64.b64encode(image_file.read()).decode('utf-8')
+                payload = {
+                    "type": "ReCaptchaV2Classification",
+                    "image": encoded_string,
+                    "question": question_code,
+                }
+                
+                solution = capsolver.solve(payload)
+                
+                logging.info(f'Captcha Solution {solution}')
+                return solution
+        else:
             
-            # Prepare the payload for the capsolver API
-            payload = {
-                "type": "ReCaptchaV2Classification",
-                "image": encoded_string,
-                "question": "/m/0199g",
-            }
+            img_solution = []  
+            solution = {}          
+            for url in image_url[1:]:                              
+                if requests.get(url[0]).status_code == 200:                    
+                    with requests.get(url[0]) as response, open("captcha_image.png", "wb") as f:
+                        f.write(response.content)
+                
+                with open("captcha_image.png", "rb") as image_file:
+                    encoded_string = base64.b64encode(image_file.read()).decode('utf-8')
             
-            # Send the payload to the capsolver API and get the solution
-            solution = capsolver.solve(payload)
-            
-            # Print the solution for debugging purposes
-            print(solution)
-            
-            
+                payload = {
+                    "type": "ReCaptchaV2Classification",
+                    "image": encoded_string,
+                    "question": question_code,
+                }
+                
+                indices = capsolver.solve(payload)               
+                logging.info(f'Captcha Solution {indices}')
+                
+                if indices.get('hasObject'):
+                    img_solution.append(url[1]-1) 
+                    
+                solution['objects'] = img_solution
+                
+        return solution   
+                    
             
     def get_recaptcha_text_instructions(self):
         
@@ -198,5 +272,7 @@ class capsolverGoogleReCaptcha(BasePage):
                 instructions_text_locator = self.wait_for_element(GoogleReCaptchaLocator.instruction_text2, constants.WAIT_TIMEOUT, silent= True).text
             except:
                 pass
+            
+        logging.info(f"instructions_text_locator : {instructions_text_locator}")
         
         return instructions_text_locator

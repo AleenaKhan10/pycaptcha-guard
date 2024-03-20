@@ -1,5 +1,6 @@
 from pycaptcha_guard.nopecha_solution.google_recaptcha import nopechaGoogleReCaptcha
 from pycaptcha_guard.nopecha_solution.textcaptcha import nopechaTextCaptcha
+from pycaptcha_guard.capsolver_solution.google_recaptcha import capsolverGoogleReCaptcha
 from pycaptcha_guard.common_components import constants
 
 
@@ -17,6 +18,11 @@ class SolveCaptcha:
             captcha_map = {
                 constants.CAPTCHA_TYPE_RECAPTCHA : (nopechaGoogleReCaptcha, 'recaptcha_solution'),
                 constants.CAPTCHA_TYPE_TEXTCAPTCHA : (nopechaTextCaptcha, 'textcaptcha_solution'),
+            }
+        if self.key_type == "capsolver":            
+            captcha_map = {
+                constants.CAPTCHA_TYPE_RECAPTCHA : (capsolverGoogleReCaptcha, 'recaptcha_solution'),
+                # constants.CAPTCHA_TYPE_TEXTCAPTCHA : (capsolverTextCaptcha, 'textcaptcha_solution'),
             }
 
         

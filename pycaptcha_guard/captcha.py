@@ -13,21 +13,24 @@ class SolveCaptcha:
         
         
     def solve_captcha(self):
-        
-        if self.key_type == "nopecha":            
+        # Initialize captcha_map to a default value, such as an empty dictionary
+        captcha_map = {}
+
+        if self.key_type == "nopecha":
             captcha_map = {
-                constants.CAPTCHA_TYPE_RECAPTCHA : (nopechaGoogleReCaptcha, 'recaptcha_solution'),
-                constants.CAPTCHA_TYPE_TEXTCAPTCHA : (nopechaTextCaptcha, 'textcaptcha_solution'),
+                constants.CAPTCHA_TYPE_RECAPTCHA: (nopechaGoogleReCaptcha, 'recaptcha_solution'),
+                constants.CAPTCHA_TYPE_TEXTCAPTCHA: (nopechaTextCaptcha, 'textcaptcha_solution'),
             }
-        if self.key_type == "capsolver":            
+        elif self.key_type == "capsolver":
             captcha_map = {
-                constants.CAPTCHA_TYPE_RECAPTCHA : (capsolverGoogleReCaptcha, 'recaptcha_solution'),
+                constants.CAPTCHA_TYPE_RECAPTCHA: (capsolverGoogleReCaptcha, 'recaptcha_solution'),
                 # constants.CAPTCHA_TYPE_TEXTCAPTCHA : (capsolverTextCaptcha, 'textcaptcha_solution'),
             }
 
-        
-        
-        captcha_class, captcha_method = captcha_map[self.captcha_type]
-        capthca_instance = captcha_class(self.driver, self.key)
-        captcha, tries_count = getattr(capthca_instance, captcha_method)()
+        captcha_class, captcha_method = captcha_map.get(self.captcha_type, (None, None))
+        if captcha_class is None or captcha_method is None:
+            raise ValueError(f"Unsupported captcha type or key type: {self.captcha_type}, {self.key_type}")
+
+        captcha_instance = captcha_class(self.driver, self.key)
+        captcha, tries_count = getattr(captcha_instance, captcha_method)()
         return captcha, tries_count

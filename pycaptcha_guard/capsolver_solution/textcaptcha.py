@@ -56,7 +56,7 @@ class capsolverTextCaptcha(BasePage):
                 logging.exception(f"Unable to write the solution in input field {e}")
             time.sleep(2)
                 
-            if self.driver.current_url == url:
+            if url in self.driver.current_url:
                 self.captcha = True
                 
         return self.captcha, tries_count

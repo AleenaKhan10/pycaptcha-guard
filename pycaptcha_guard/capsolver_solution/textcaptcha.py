@@ -57,7 +57,7 @@ class capsolverTextCaptcha(BasePage):
             time.sleep(2)
                 
             if self.driver.current_url == url:
-                self.captcha = False
+                self.captcha = True
                 
         return self.captcha, tries_count
         

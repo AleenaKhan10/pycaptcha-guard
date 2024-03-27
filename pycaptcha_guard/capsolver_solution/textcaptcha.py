@@ -40,27 +40,26 @@ class capsolverTextCaptcha(BasePage):
         while self.captcha:
             tries_count += 1
             
-            url = self.driver.current_url
             captcha_image_encoded_str = self.get_textcaptcha_params()
-            for _ in range(constants.MAX_RECURSION_COUNT):
-                try:
-                    solution = self.get_captcha_solution(captcha_image_encoded_str)
-                    break
-                except Exception as e:
-                    logging.exception(f"Unable to get API response {e}")
-                    time.sleep(4)
+            if captcha_image_encoded_str:
+                for _ in range(constants.MAX_RECURSION_COUNT):
+                    try:
+                        solution = self.get_captcha_solution(captcha_image_encoded_str)
+                        break
+                    except Exception as e:
+                        logging.exception(f"Unable to get API response {e}")
+                        time.sleep(4)
              
-            try:       
-                self.captcha = self.fill_input_field(solution)
-            except Exception as e:
-                logging.exception(f"Unable to write the solution in input field {e}")
-            time.sleep(2)
-                
-            if url in self.driver.current_url:
-                self.captcha = True
+                try:       
+                    self.captcha = self.fill_input_field(solution)
+                except Exception as e:
+                    logging.exception(f"Unable to write the solution in input field {e}")
+                time.sleep(2)
+            else:
+                self.captcha = False
                 
         return self.captcha, tries_count
-        
+         
         
     def get_textcaptcha_params(self):
         
@@ -72,11 +71,13 @@ class capsolverTextCaptcha(BasePage):
         """
         encoded_string = None
         captcha_img = self.wait_for_element(TextCaptchaLocators.captcha_img)
-        captcha_img_src = captcha_img.get_attribute("src")
-        response = requests.get(captcha_img_src)
-        if response.status_code == 200:
-            encoded_string = base64.b64encode(response.content).decode('utf-8')
-        return encoded_string
+        if captcha_img:
+            captcha_img_src = captcha_img.get_attribute("src")
+            response = requests.get(captcha_img_src)
+            if response.status_code == 200:
+                encoded_string = base64.b64encode(response.content).decode('utf-8')
+            return encoded_string
+        return False
     
     
     def get_captcha_solution(self, image_encoded_str):

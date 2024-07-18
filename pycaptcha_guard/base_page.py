@@ -59,8 +59,11 @@ class BasePage:
         if element:
             for one in text:
                 element.send_keys(one)
-
-            self.press_enter_on_element(by_locator)
+            try:
+                self.press_enter_on_element(by_locator)
+            except Exception as e:
+                logging.exception(f"Failed to press enter on element {by_locator}: {e}")
+                element.submit()
         time.sleep(2) 
         
         

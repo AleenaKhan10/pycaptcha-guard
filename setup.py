@@ -2,7 +2,7 @@ import setuptools
 
 setuptools.setup(
     name="pycaptcha-guard",
-    version="0.3.4",
+    version="0.3.5",
     author="AleenaMuskan",
     author_email="aleenakhanraees40@gmail.com",
     description="Solve any kind of captcha like human",
@@ -11,11 +11,11 @@ setuptools.setup(
     license="MIT",
     packages=setuptools.find_packages(),
     install_requires=[
-        "nopecha==1.0.8",
-        "selenium==4.16.0",
+        "nopecha>=1.0.8",
+        "selenium>=4.16.0",
         "pillow==10.1.0",
         "pyautogui==0.9.54",
-        "capsolver==1.0.7"
+        "capsolver>=1.0.7"
     ],
     python_requires=">=3.9",
 )

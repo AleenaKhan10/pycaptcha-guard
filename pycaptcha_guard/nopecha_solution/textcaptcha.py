@@ -47,7 +47,11 @@ class nopechaTextCaptcha(BasePage):
                     logging.exception(f"Unable to get API response {e}")
                     time.sleep(4)
                     
-            self.captcha = self.fill_input_field(solution)
+            try:       
+                self.captcha = self.fill_input_field(solution)
+            except Exception as e:
+                logging.exception(f"Unable to write the solution in input field {e}")
+            time.sleep(2)
         return self.captcha, tries_count
         
         

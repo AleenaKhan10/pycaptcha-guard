@@ -4,7 +4,7 @@ import nopecha
 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webdriver import WebDriver
-from selenium.common.exceptions import TimeoutException
+from selenium.common.exceptions import StaleElementReferenceException, WebDriverException
 
 from pycaptcha_guard.base_page import BasePage
 from pycaptcha_guard.captcha_locators.google_recaptcha_locator import GoogleReCaptchaLocator
@@ -47,20 +47,25 @@ class nopechaGoogleReCaptcha(BasePage):
             
             tries_count += 1
             
-            iframe_popup = self.wait_for_element(GoogleReCaptchaLocator.iframe_popup_recaptcha)
-            time.sleep(2)
-            iframe_popup_measures = self.get_frame_axis(iframe_popup, GoogleReCaptchaLocator.iframe_popup_recaptcha)
-            self.switch_to_iframe(iframe_popup)
-            try:
-                logging.info("Solving captcha")
-                self.complete_captcha(iframe_popup_measures)                
-              
-            except Exception as e:
-                logging.exception(f"Error while solving captcha {e}")
-
+            try:            
+                iframe_popup = self.wait_for_element(GoogleReCaptchaLocator.iframe_popup_recaptcha)
+                time.sleep(2)
+                iframe_popup_measures = self.get_frame_axis(iframe_popup, GoogleReCaptchaLocator.iframe_popup_recaptcha)
+                self.switch_to_iframe(iframe_popup)
+                try:
+                    logging.info("Solving captcha")
+                    self.complete_captcha(iframe_popup_measures)                
                 
-            logging.info('Going to switch to the default content')
-            self.switch_to_default_content()
+                except Exception as e:
+                    logging.exception(f"Error while solving captcha {e}")
+
+                    
+                logging.info('Going to switch to the default content')
+                self.switch_to_default_content()
+            except StaleElementReferenceException:
+                logging.warning("Stale element reference error occurred while solving captcha.")
+            except WebDriverException:
+                logging.warning("Webdriver exception occurred while solving captcha")
 
             time.sleep(3)
             iframe_popup = self.wait_for_element(GoogleReCaptchaLocator.iframe_popup_recaptcha, constants.WAIT_TIMEOUT, silent=True)

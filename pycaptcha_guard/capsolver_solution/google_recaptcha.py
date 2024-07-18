@@ -6,7 +6,7 @@ import base64
 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webdriver import WebDriver
-from selenium.common.exceptions import StaleElementReferenceException
+from selenium.common.exceptions import StaleElementReferenceException, WebDriverException
 
 from pycaptcha_guard.base_page import BasePage
 from pycaptcha_guard.captcha_locators.google_recaptcha_locator import GoogleReCaptchaLocator
@@ -65,7 +65,9 @@ class capsolverGoogleReCaptcha(BasePage):
                 logging.info('Going to switch to the default content')
                 self.switch_to_default_content()
             except StaleElementReferenceException:
-                logging.warning("Stale element reference error occured.")
+                logging.warning("Stale element reference error occurred while solving captcha.")
+            except WebDriverException:
+                logging.warning("Webdriver exception occurred while solving captcha Not connected to devtools")
 
             time.sleep(3)
             iframe_popup = self.wait_for_element(GoogleReCaptchaLocator.iframe_popup_recaptcha, constants.WAIT_TIMEOUT, silent=True)

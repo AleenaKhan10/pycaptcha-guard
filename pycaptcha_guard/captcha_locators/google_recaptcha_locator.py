@@ -24,4 +24,5 @@ class GoogleReCaptchaLocator:
     try_again_error = (By.CLASS_NAME, "rc-imageselect-incorrect-response")
     select_more_error = (By.CLASS_NAME, "rc-imageselect-error-select-more")
     select_new_error = (By.CLASS_NAME, "rc-imageselect-error-select-something")
-    image_link = (By.TAG_NAME, "img")
+    # image_link = (By.TAG_NAME, "img")
+    image_link = (By.XPATH, "//div[contains(@class,'rc-imageselect')]//img")

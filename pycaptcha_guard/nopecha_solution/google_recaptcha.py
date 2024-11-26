@@ -48,6 +48,11 @@ class nopechaGoogleReCaptcha(BasePage):
             tries_count += 1
             
             try:            
+                # switch to unusual traffic google iframe
+                iframe_unusual_recaptcha_checkbox_locator = self.wait_for_element(GoogleReCaptchaLocator.iframe_checkbox_unusual_traffic_recaptcha)  
+                if iframe_unusual_recaptcha_checkbox_locator:
+                    self.switch_to_iframe(iframe_unusual_recaptcha_checkbox_locator)
+
                 iframe_popup = self.wait_for_element(GoogleReCaptchaLocator.iframe_popup_recaptcha)
                 time.sleep(2)
                 iframe_popup_measures = self.get_frame_axis(iframe_popup, GoogleReCaptchaLocator.iframe_popup_recaptcha)
@@ -81,6 +86,12 @@ class nopechaGoogleReCaptcha(BasePage):
         """
             Clicks the reCAPTCHA checkbox to verify the user's action.
         """        
+
+        # switch to unusual traffic google iframe
+        iframe_unusual_recaptcha_checkbox_locator = self.wait_for_element(GoogleReCaptchaLocator.iframe_checkbox_unusual_traffic_recaptcha)  
+        if iframe_unusual_recaptcha_checkbox_locator:
+            self.switch_to_iframe(iframe_unusual_recaptcha_checkbox_locator)
+
         iframe_recaptcha_checkbox_locator = self.wait_for_element(GoogleReCaptchaLocator.iframe_checkbox_recaptcha)  
         iframe_recaptcha_checkbox_locator_measures = self.get_frame_axis(iframe_recaptcha_checkbox_locator, GoogleReCaptchaLocator.iframe_checkbox_recaptcha)       
         self.switch_to_iframe(iframe_recaptcha_checkbox_locator)

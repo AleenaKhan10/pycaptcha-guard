@@ -31,6 +31,16 @@ class BasePage:
             if not silent:
                 logging.exception(f"Element with locator {locator} on url {self.driver.current_url} not found within {timeout} seconds")
         return None
+    
+    
+    def wait_for_element_to_be_visible(self, locator: Tuple[str, str], timeout: int=constants.WAIT_TIMEOUT, silent=False) -> Optional[WebElement]:
+        try:
+            element = WebDriverWait(self.driver, timeout).until(EC.visibility_of_element_located(locator))
+            return element
+        except TimeoutException:
+            if not silent:
+                logging.exception(f"Element with locator {locator} on url {self.driver.current_url} not found within {timeout} seconds")
+        return None
         
         
     def switch_to_iframe(self, locator: Tuple[str, str], timeout: int = constants.WAIT_TIMEOUT) -> None:

@@ -11,6 +11,7 @@ class GoogleReCaptchaLocator:
         return None
     
     
+    iframe_checkbox_unusual_traffic_recaptcha = (By.CSS_SELECTOR,"iframe[title='Captcha']")
     iframe_checkbox_recaptcha = (By.CSS_SELECTOR,"iframe[title='reCAPTCHA']")
     recaptcha_checkbox = (By.CSS_SELECTOR, "div.recaptcha-checkbox-border")
     iframe_popup_recaptcha =  (By.CSS_SELECTOR,"iframe[title='recaptcha challenge expires in two minutes']")
@@ -26,3 +27,4 @@ class GoogleReCaptchaLocator:
     select_new_error = (By.CLASS_NAME, "rc-imageselect-error-select-something")
     # image_link = (By.TAG_NAME, "img")
     image_link = (By.XPATH, "//div[contains(@class,'rc-imageselect')]//img")
+    captcha_expired_msg = (By.XPATH, "//span[contains(., 'challenge expired')]")

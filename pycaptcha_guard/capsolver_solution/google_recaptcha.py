@@ -27,6 +27,23 @@ class capsolverGoogleReCaptcha(BasePage):
         super().__init__(driver)
         self.captcha = True
         self.capsolver_key = key
+    
+    
+    def check_captcha_expired(self):
+    
+        captcha_expired = False
+        iframe_unusual_recaptcha_checkbox_locator = self.wait_for_element(GoogleReCaptchaLocator.iframe_checkbox_unusual_traffic_recaptcha)  
+        if iframe_unusual_recaptcha_checkbox_locator:
+            self.switch_to_iframe(iframe_unusual_recaptcha_checkbox_locator)
+
+        iframe_recaptcha_checkbox_locator = self.wait_for_element(GoogleReCaptchaLocator.iframe_checkbox_recaptcha)  
+        self.switch_to_iframe(iframe_recaptcha_checkbox_locator)
+
+        captcha_expired = self.wait_for_element_to_be_visible(GoogleReCaptchaLocator.captcha_expired_msg, 2)
+
+        self.switch_to_default_content()
+
+        return captcha_expired
         
     
     def recaptcha_solution(self): 
@@ -42,7 +59,8 @@ class capsolverGoogleReCaptcha(BasePage):
         start_time = time.time()
         
         while self.captcha and tries_count < constants.RECURSION_COUNT_SIX:
-            if round(time.time() - start_time) > constants.CAPTCHA_MAX_TIME:
+            captcha_expired = self.check_captcha_expired()
+            if round(time.time() - start_time) > constants.CAPTCHA_MAX_TIME or captcha_expired:
                 logging.info('Going to click to checkbox again')
                 start_time = time.time()
                 self.click_captcha_checkbox()
@@ -50,6 +68,11 @@ class capsolverGoogleReCaptcha(BasePage):
             tries_count += 1
             
             try:
+                # switch to unusual traffic google iframe
+                iframe_unusual_recaptcha_checkbox_locator = self.wait_for_element(GoogleReCaptchaLocator.iframe_checkbox_unusual_traffic_recaptcha)  
+                if iframe_unusual_recaptcha_checkbox_locator:
+                    self.switch_to_iframe(iframe_unusual_recaptcha_checkbox_locator)
+
                 iframe_popup = self.wait_for_element(GoogleReCaptchaLocator.iframe_popup_recaptcha)
                 time.sleep(2)
                 iframe_popup_measures = self.get_frame_axis(iframe_popup, GoogleReCaptchaLocator.iframe_popup_recaptcha)
@@ -70,6 +93,9 @@ class capsolverGoogleReCaptcha(BasePage):
                 logging.warning("Webdriver exception occurred while solving captcha Not connected to devtools")
 
             time.sleep(3)
+            iframe_unusual_recaptcha_checkbox_locator = self.wait_for_element(GoogleReCaptchaLocator.iframe_checkbox_unusual_traffic_recaptcha)  
+            if iframe_unusual_recaptcha_checkbox_locator:
+                self.switch_to_iframe(iframe_unusual_recaptcha_checkbox_locator)
             iframe_popup = self.wait_for_element(GoogleReCaptchaLocator.iframe_popup_recaptcha, constants.WAIT_TIMEOUT, silent=True)
             logging.info('Iframe found Trying again')
             if not iframe_popup:
@@ -82,7 +108,13 @@ class capsolverGoogleReCaptcha(BasePage):
         
         """
             Clicks the reCAPTCHA checkbox to verify the user's action.
-        """        
+        """   
+
+        # switch to unusual traffic google iframe
+        iframe_unusual_recaptcha_checkbox_locator = self.wait_for_element(GoogleReCaptchaLocator.iframe_checkbox_unusual_traffic_recaptcha)  
+        if iframe_unusual_recaptcha_checkbox_locator:
+            self.switch_to_iframe(iframe_unusual_recaptcha_checkbox_locator)
+
         iframe_recaptcha_checkbox_locator = self.wait_for_element(GoogleReCaptchaLocator.iframe_checkbox_recaptcha)  
         iframe_recaptcha_checkbox_locator_measures = self.get_frame_axis(iframe_recaptcha_checkbox_locator, GoogleReCaptchaLocator.iframe_checkbox_recaptcha)       
         self.switch_to_iframe(iframe_recaptcha_checkbox_locator)
